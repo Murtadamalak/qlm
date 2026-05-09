@@ -2,53 +2,42 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductManagerComponent } from './product-manager.component';
 import { OrderManagerComponent } from './order-manager.component';
-import { PricingManagerComponent } from './pricing-manager.component';
 
-type AdminView = 'products' | 'orders' | 'pricing';
+type AdminView = 'products' | 'orders';
 
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, ProductManagerComponent, OrderManagerComponent, PricingManagerComponent],
+  imports: [CommonModule, ProductManagerComponent, OrderManagerComponent],
   template: `
-    <div class="max-w-7xl mx-auto">
-        <h2 class="text-3xl font-bold text-slate-800 mb-6">لوحة تحكم المدير</h2>
+    <div class="mx-auto max-w-7xl">
+      <div class="mb-8 overflow-hidden rounded-[2rem] bg-[#004643] p-7 text-[#F0EDE5] shadow-2xl shadow-[#004643]/15">
+        <p class="text-sm font-black uppercase tracking-[0.35em] text-[#F0EDE5]/50">Admin</p>
+        <h2 class="mt-3 text-4xl font-black tracking-tight">لوحة تحكم المدير</h2>
+        <p class="mt-3 text-[#F0EDE5]/65">إدارة منتجات المتجر والطلبات بتصميم حديث وواضح.</p>
+      </div>
 
-        <div class="border-b border-slate-200 mb-6">
-            <nav class="-mb-px flex space-x-4 space-x-reverse" aria-label="Tabs">
-                <button (click)="view.set('products')" 
-                        [class]="currentViewClass('products')">
-                    إدارة المنتجات
-                </button>
-                <button (click)="view.set('orders')" 
-                        [class]="currentViewClass('orders')">
-                    إدارة الطلبات
-                </button>
-                <button (click)="view.set('pricing')"
-                        [class]="currentViewClass('pricing')">
-                    إدارة الأسعار
-                </button>
-            </nav>
-        </div>
+      <div class="mb-6 rounded-[2rem] border border-[#004643]/10 bg-white/70 p-2 shadow-lg shadow-[#004643]/5 backdrop-blur">
+        <nav class="flex gap-2" aria-label="Tabs">
+          <button (click)="view.set('products')" [class]="currentViewClass('products')">إدارة المنتجات</button>
+          <button (click)="view.set('orders')" [class]="currentViewClass('orders')">إدارة الطلبات</button>
+        </nav>
+      </div>
 
-        <div>
-            @switch(view()) {
-                @case('products') { <app-product-manager></app-product-manager> }
-                @case('orders') { <app-order-manager></app-order-manager> }
-                @case('pricing') { <app-pricing-manager></app-pricing-manager> }
-            }
-        </div>
+      @switch(view()) {
+        @case('products') { <app-product-manager></app-product-manager> }
+        @case('orders') { <app-order-manager></app-order-manager> }
+      }
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminComponent {
-    view = signal<AdminView>('products');
+  view = signal<AdminView>('products');
 
-    baseTabClass = 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm';
-    activeTabClass = 'border-teal-500 text-teal-600';
-    inactiveTabClass = 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300';
-
-    currentViewClass(viewName: AdminView) {
-        return `${this.baseTabClass} ${this.view() === viewName ? this.activeTabClass : this.inactiveTabClass}`;
-    }
+  currentViewClass(viewName: AdminView) {
+    const base = 'flex-1 rounded-[1.5rem] px-5 py-3 text-sm font-black transition';
+    return this.view() === viewName
+      ? `${base} bg-[#004643] text-[#F0EDE5] shadow-lg`
+      : `${base} text-[#004643]/65 hover:bg-[#F0EDE5] hover:text-[#004643]`;
+  }
 }

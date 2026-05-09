@@ -6,17 +6,7 @@ export interface Product {
   description: string;
 }
 
-export interface PrintJob {
-  fileNames: string[];
-  paperSize: 'A4';
-  colorMode: 'bw' | 'color';
-  copies: number;
-  binding: 'none' | 'staple' | 'spiral';
-  duplex: 'single' | 'double';
-  pageCount: number;
-}
-
-export type CartItem = (Product & { type: 'product' }) | (PrintJob & { type: 'print', price: number, name: string });
+export type CartItem = Product & { type: 'product' };
 
 export interface Order {
   id: string;
@@ -29,7 +19,7 @@ export interface Order {
 }
 
 export interface User {
-    id: string;
-    username: string;
-    role: 'customer' | 'admin';
+  id: string;
+  username: string;
+  role: 'customer' | 'admin';
 }

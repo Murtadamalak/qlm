@@ -24,21 +24,7 @@ export class CartComponent {
       this.cartService.clearCart();
       this.checkoutSuccess.emit();
     } else {
-      // This should not happen if the cart view is protected, but as a safeguard:
       alert('الرجاء تسجيل الدخول أولاً لإتمام الطلب.');
     }
-  }
-
-  translateBinding(binding: 'none' | 'staple' | 'spiral'): string {
-    switch (binding) {
-      case 'none': return 'بدون';
-      case 'staple': return 'تدبيس';
-      case 'spiral': return 'حلزوني';
-      default: return '';
-    }
-  }
-
-  translateDuplex(duplex: 'single' | 'double'): string {
-    return duplex === 'single' ? 'وجه واحد' : 'وجهين';
   }
 }

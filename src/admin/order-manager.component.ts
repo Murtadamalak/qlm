@@ -2,53 +2,53 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../services/order.service';
-import { OrdersComponent } from '../orders.component'; // To reuse getStatusClass
-import { Order, PrintJob } from '../models';
+import { Order } from '../models';
 
 @Component({
   selector: 'app-order-manager',
   imports: [CommonModule, FormsModule],
-  providers: [OrdersComponent], // Provide OrdersComponent to use its methods
   templateUrl: './order-manager.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderManagerComponent {
-    orderService = inject(OrderService);
-    ordersComponent = inject(OrdersComponent); // Inject to use its methods
-    orders = this.orderService.orders;
+  orderService = inject(OrderService);
+  orders = this.orderService.orders;
+  selectedOrder = signal<Order | null>(null);
+  orderStatuses: Order['status'][] = ['Pending', 'In Progress', 'Ready', 'Delivered'];
 
-    selectedOrder = signal<Order | null>(null);
+  viewOrderDetails(order: Order) {
+    this.selectedOrder.set(order);
+  }
 
-    orderStatuses: Order['status'][] = ['Pending', 'In Progress', 'Ready', 'Delivered'];
+  closeOrderDetails() {
+    this.selectedOrder.set(null);
+  }
 
-    viewOrderDetails(order: Order) {
-        this.selectedOrder.set(order);
+  onStatusChange(order: Order, event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.orderService.updateOrderStatus(order.id, select.value as Order['status']);
+    if (this.selectedOrder()?.id === order.id) {
+      this.selectedOrder.update(current => current ? { ...current, status: select.value as Order['status'] } : null);
     }
+  }
 
-    closeOrderDetails() {
-        this.selectedOrder.set(null);
+  getStatusClass(status: Order['status']) {
+    switch (status) {
+      case 'Pending': return 'bg-amber-100 text-amber-800';
+      case 'In Progress': return 'bg-[#F0EDE5] text-[#004643]';
+      case 'Ready': return 'bg-emerald-100 text-emerald-800';
+      case 'Delivered': return 'bg-slate-100 text-slate-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
+  }
 
-    onStatusChange(order: Order, event: Event) {
-        const selectElement = event.target as HTMLSelectElement;
-        const newStatus = selectElement.value as Order['status'];
-        this.orderService.updateOrderStatus(order.id, newStatus);
+  translateStatus(status: Order['status']) {
+    switch (status) {
+      case 'Pending': return 'قيد الانتظار';
+      case 'In Progress': return 'قيد التجهيز';
+      case 'Ready': return 'جاهز للاستلام';
+      case 'Delivered': return 'تم التوصيل';
+      default: return status;
     }
-    
-    // Delegate to the injected OrdersComponent instance
-    getStatusClass(status: string) {
-        return this.ordersComponent.getStatusClass(status);
-    }
-
-    translateStatus(status: Order['status']) {
-        return this.ordersComponent.translateStatus(status);
-    }
-
-    translateBinding(binding: PrintJob['binding']) {
-        return this.ordersComponent.translateBinding(binding);
-    }
-
-    translateDuplex(duplex: PrintJob['duplex']) {
-        return this.ordersComponent.translateDuplex(duplex);
-    }
+  }
 }

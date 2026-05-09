@@ -1,54 +1,58 @@
-<div class="max-w-4xl mx-auto">
-    <h2 class="text-3xl font-bold text-slate-800 mb-8">سلة التسوق الخاصة بك</h2>
+<div class="mx-auto max-w-5xl">
+  <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-sm font-black uppercase tracking-[0.35em] text-[#004643]/45">Checkout</p>
+      <h2 class="mt-2 text-4xl font-black text-[#004643]">سلة التسوق</h2>
+    </div>
+    <div class="rounded-full bg-white/70 px-5 py-2 text-sm font-bold text-[#004643]/60 shadow-sm">الدفع عند الاستلام</div>
+  </div>
 
-    @if (cartService.itemCount() === 0) {
-        <div class="bg-white p-8 rounded-lg shadow-md text-center">
-            <p class="text-slate-500">سلتك فارغة.</p>
-        </div>
-    } @else {
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Cart Items -->
-            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                <ul class="divide-y divide-slate-200">
-                    @for (item of cartService.items(); track $index) {
-                        <li class="py-4 flex">
-                            <div class="flex-grow">
-                                <h3 class="font-semibold text-slate-800">{{ item.name }}</h3>
-                                @if (item.type === 'print') {
-                                    <p class="text-sm text-slate-500">{{ item.pageCount }} صفحات، {{ item.copies }} نسخ، {{ item.colorMode === 'bw' ? 'أبيض وأسود' : 'ملون' }}</p>
-                                    <p class="text-sm text-slate-500">طباعة {{ translateDuplex(item.duplex) }}، تجليد {{ translateBinding(item.binding) }}</p>
-                                }
-                            </div>
-                            <div class="flex-shrink-0 ms-4 flex flex-col items-end">
-                                <span class="font-semibold text-slate-900">{{ item.price | number:'1.0-0' }} د.ع</span>
-                                <button (click)="cartService.removeItem($index)" class="text-sm text-red-500 hover:text-red-700 mt-1">إزالة</button>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            </div>
+  @if (cartService.itemCount() === 0) {
+    <div class="rounded-[2rem] border border-[#004643]/10 bg-white/70 p-12 text-center shadow-xl shadow-[#004643]/5">
+      <div class="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-[#004643] text-2xl text-[#F0EDE5]">🛒</div>
+      <p class="mt-5 text-lg font-bold text-[#004643]/65">سلتك فارغة.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div class="lg:col-span-2 overflow-hidden rounded-[2rem] border border-[#004643]/10 bg-white/70 shadow-xl shadow-[#004643]/5 backdrop-blur">
+        <ul class="divide-y divide-[#004643]/10">
+          @for (item of cartService.items(); track $index) {
+            <li class="flex items-center justify-between gap-4 p-5">
+              <div>
+                <h3 class="text-lg font-black text-[#004643]">{{ item.name }}</h3>
+                <p class="mt-1 text-sm text-[#004643]/55">{{ item.description }}</p>
+              </div>
+              <div class="flex-shrink-0 text-left">
+                <span class="block rounded-2xl bg-[#F0EDE5] px-4 py-2 font-black text-[#004643]">{{ item.price | number:'1.0-0' }} د.ع</span>
+                <button (click)="cartService.removeItem($index)" class="mt-2 text-sm font-bold text-red-600 hover:text-red-700">إزالة</button>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
 
-            <!-- Order Summary -->
-            <div class="lg:col-span-1">
-                <div class="bg-white p-6 rounded-lg shadow-md sticky top-24">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">ملخص الطلب</h3>
-                    <div class="flex justify-between text-slate-600 mb-2">
-                        <span>المجموع الفرعي</span>
-                        <span>{{ cartService.total() | number:'1.0-0' }} د.ع</span>
-                    </div>
-                    <div class="flex justify-between text-slate-600 mb-4">
-                        <span>طريقة الدفع</span>
-                        <span>الدفع عند الاستلام</span>
-                    </div>
-                    <div class="flex justify-between font-bold text-xl text-slate-900 border-t pt-4">
-                        <span>المجموع الكلي</span>
-                        <span>{{ cartService.total() | number:'1.0-0' }} د.ع</span>
-                    </div>
-                    <button (click)="placeOrder()" class="mt-6 w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700 transition duration-300">
-                        إتمام الطلب
-                    </button>
-                </div>
+      <aside class="lg:col-span-1">
+        <div class="sticky top-28 rounded-[2rem] bg-[#004643] p-6 text-[#F0EDE5] shadow-2xl shadow-[#004643]/20">
+          <h3 class="text-2xl font-black">ملخص الطلب</h3>
+          <div class="mt-6 space-y-4 text-[#F0EDE5]/75">
+            <div class="flex justify-between">
+              <span>المجموع الفرعي</span>
+              <span>{{ cartService.total() | number:'1.0-0' }} د.ع</span>
             </div>
+            <div class="flex justify-between">
+              <span>طريقة الدفع</span>
+              <span>عند الاستلام</span>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-between border-t border-[#F0EDE5]/15 pt-5 text-2xl font-black">
+            <span>الإجمالي</span>
+            <span>{{ cartService.total() | number:'1.0-0' }} د.ع</span>
+          </div>
+          <button (click)="placeOrder()" class="mt-6 w-full rounded-2xl bg-[#F0EDE5] px-5 py-4 text-lg font-black text-[#004643] shadow-lg transition hover:-translate-y-1 hover:bg-white">
+            تأكيد الطلب
+          </button>
         </div>
-    }
+      </aside>
+    </div>
+  }
 </div>
