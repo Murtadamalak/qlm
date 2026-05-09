@@ -1,0 +1,37 @@
+@if (view() === 'login') {
+    <app-login (loginSuccess)="onLoginSuccess()"></app-login>
+} @else {
+    <div class="min-h-screen bg-slate-50 flex flex-col">
+      <app-header (navigate)="onNavigate($event)"></app-header>
+      
+      <main class="container mx-auto p-4 sm:p-6 lg:p-8 flex-grow">
+        @switch (view()) {
+          @case ('home') {
+            <app-home (navigate)="onNavigate($event)"></app-home>
+          }
+          @case ('print') {
+            <app-print-order (orderPlaced)="onNavigate('cart')"></app-print-order>
+          }
+          @case ('store') {
+            <app-store></app-store>
+          }
+          @case ('cart') {
+            <app-cart (checkoutSuccess)="onNavigate('orders')"></app-cart>
+          }
+          @case ('orders') {
+            <app-orders></app-orders>
+          }
+          @case ('admin') {
+            <app-admin></app-admin>
+          }
+        }
+      </main>
+    
+      <footer class="bg-white border-t mt-12">
+        <div class="container mx-auto py-6 px-4 text-center text-slate-500">
+          <p>&copy; 2026 مكتبة القلم. جميع الحقوق محفوظة.</p>
+          <p class="text-sm mt-1">مرتضى علاء</p>
+        </div>
+      </footer>
+    </div>
+}

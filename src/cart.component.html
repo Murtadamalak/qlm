@@ -1,0 +1,54 @@
+<div class="max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-slate-800 mb-8">سلة التسوق الخاصة بك</h2>
+
+    @if (cartService.itemCount() === 0) {
+        <div class="bg-white p-8 rounded-lg shadow-md text-center">
+            <p class="text-slate-500">سلتك فارغة.</p>
+        </div>
+    } @else {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Cart Items -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                <ul class="divide-y divide-slate-200">
+                    @for (item of cartService.items(); track $index) {
+                        <li class="py-4 flex">
+                            <div class="flex-grow">
+                                <h3 class="font-semibold text-slate-800">{{ item.name }}</h3>
+                                @if (item.type === 'print') {
+                                    <p class="text-sm text-slate-500">{{ item.pageCount }} صفحات، {{ item.copies }} نسخ، {{ item.colorMode === 'bw' ? 'أبيض وأسود' : 'ملون' }}</p>
+                                    <p class="text-sm text-slate-500">طباعة {{ translateDuplex(item.duplex) }}، تجليد {{ translateBinding(item.binding) }}</p>
+                                }
+                            </div>
+                            <div class="flex-shrink-0 ms-4 flex flex-col items-end">
+                                <span class="font-semibold text-slate-900">{{ item.price | number:'1.0-0' }} د.ع</span>
+                                <button (click)="cartService.removeItem($index)" class="text-sm text-red-500 hover:text-red-700 mt-1">إزالة</button>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-lg shadow-md sticky top-24">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">ملخص الطلب</h3>
+                    <div class="flex justify-between text-slate-600 mb-2">
+                        <span>المجموع الفرعي</span>
+                        <span>{{ cartService.total() | number:'1.0-0' }} د.ع</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600 mb-4">
+                        <span>طريقة الدفع</span>
+                        <span>الدفع عند الاستلام</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-xl text-slate-900 border-t pt-4">
+                        <span>المجموع الكلي</span>
+                        <span>{{ cartService.total() | number:'1.0-0' }} د.ع</span>
+                    </div>
+                    <button (click)="placeOrder()" class="mt-6 w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700 transition duration-300">
+                        إتمام الطلب
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

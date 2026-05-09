@@ -1,0 +1,105 @@
+<div>
+    <!-- Order Table View -->
+    @if (!selectedOrder()) {
+        <div class="bg-white shadow-sm rounded-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">رقم الطلب</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">اسم الزبون</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">التاريخ</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">الإجمالي</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">الحالة</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-slate-200">
+                    @if(orders().length === 0) {
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-slate-500">لا توجد طلبات لعرضها.</td>
+                        </tr>
+                    }
+                    @for(order of orders(); track order.id) {
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                <button (click)="viewOrderDetails(order)" class="text-teal-600 hover:text-teal-700 font-semibold">{{ order.id }}</button>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ order.customerName }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ order.orderDate | date:'short' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ order.total | number:'1.0-0' }} د.ع</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <select [ngModel]="order.status" (change)="onStatusChange(order, $event)" 
+                                        [class]="'w-full p-1 rounded-md text-xs border-0 focus:ring-2 focus:ring-teal-500 ' + getStatusClass(order.status)">
+                                    @for(status of orderStatuses; track status) {
+                                        <option [value]="status">{{ translateStatus(status) }}</option>
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Order Details Modal View -->
+    @if (selectedOrder(); as order) {
+        <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fade-in" (click)="closeOrderDetails()">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-scale-up" (click)="$event.stopPropagation()">
+                <!-- Header -->
+                <div class="flex justify-between items-center p-5 border-b bg-slate-50 rounded-t-lg">
+                    <h3 class="text-xl font-bold text-slate-800">تفاصيل الطلب: {{ order.id }}</h3>
+                    <button (click)="closeOrderDetails()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Body (Scrollable) -->
+                <div class="p-6 overflow-y-auto">
+                    <!-- Order Info -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mb-6 pb-4 border-b">
+                    <div><span class="font-medium text-slate-500">الزبون:</span> <span class="text-slate-800 font-semibold">{{ order.customerName }}</span></div>
+                    <div><span class="font-medium text-slate-500">التاريخ:</span> <span class="text-slate-800 font-semibold">{{ order.orderDate | date:'fullDate' }} الساعة {{ order.orderDate | date:'shortTime' }}</span></div>
+                    <div><span class="font-medium text-slate-500">الإجمالي:</span> <span class="text-slate-800 font-bold text-lg">{{ order.total | number:'1.0-0' }} د.ع</span></div>
+                    <div><span class="font-medium text-slate-500">الحالة:</span> <span [class]="'px-2 py-1 text-xs font-semibold rounded-full ' + getStatusClass(order.status)">{{ translateStatus(order.status) }}</span></div>
+                    </div>
+
+                    <!-- Items List -->
+                    <h4 class="text-lg font-bold text-slate-700 mb-4">العناصر المطلوبة ({{ order.items.length }})</h4>
+                    <ul class="space-y-4">
+                    @for(item of order.items; track $index) {
+                        <li class="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                            <p class="font-bold text-slate-800">{{item.name}}</p>
+                            @if (item.type === 'product') {
+                                <p class="text-sm text-slate-500">{{ item.description }}</p>
+                            }
+                            </div>
+                            <p class="font-semibold text-slate-900 whitespace-nowrap">{{ item.price | number:'1.0-0' }} د.ع</p>
+                        </div>
+                        
+                        @if(item.type === 'print') {
+                            <div class="mt-3 pt-3 border-t border-slate-200">
+                                <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                                    <div class="col-span-full"><dt class="font-medium text-slate-600">الملفات:</dt> <dd class="text-slate-500">{{ item.fileNames.join(', ') }}</dd></div>
+                                    <div><dt class="font-medium text-slate-600">عدد الصفحات:</dt> <dd class="text-slate-500">{{ item.pageCount }}</dd></div>
+                                    <div><dt class="font-medium text-slate-600">عدد النسخ:</dt> <dd class="text-slate-500">{{ item.copies }}</dd></div>
+                                    <div><dt class="font-medium text-slate-600">اللون:</dt> <dd class="text-slate-500">{{ item.colorMode === 'bw' ? 'أبيض وأسود' : 'ملون' }}</dd></div>
+                                    <div><dt class="font-medium text-slate-600">نوع الطباعة:</dt> <dd class="text-slate-500">{{ translateDuplex(item.duplex) }}</dd></div>
+                                    <div><dt class="font-medium text-slate-600">التجليد:</dt> <dd class="text-slate-500">{{ translateBinding(item.binding) }}</dd></div>
+                                </dl>
+                            </div>
+                        }
+                        </li>
+                    }
+                    </ul>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-end p-4 border-t bg-slate-50 rounded-b-lg">
+                    <button (click)="closeOrderDetails()" class="px-5 py-2 text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

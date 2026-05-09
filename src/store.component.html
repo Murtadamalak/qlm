@@ -1,0 +1,47 @@
+<div class="max-w-7xl mx-auto">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+        <h2 class="text-3xl font-bold text-slate-800">قرطاسية ومنتجات</h2>
+        <div class="relative w-full sm:w-72">
+            <input 
+                type="text" 
+                placeholder="ابحث عن منتج..."
+                [value]="searchTerm()"
+                (input)="onSearch($event)"
+                class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    @if (filteredProducts().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @for (product of filteredProducts(); track product.id) {
+                <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col group transition-shadow duration-300 hover:shadow-xl">
+                    <div class="overflow-hidden">
+                        <img [src]="product.imageUrl" [alt]="product.name" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow text-right">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2 min-h-[3.5rem]">{{ product.name }}</h3>
+                        <div class="flex justify-between items-center mt-auto pt-2">
+                            <span class="text-xl font-bold text-slate-900">{{ product.price | number:'1.0-0' }} د.ع</span>
+                            <button (click)="addToCart(product)" class="bg-teal-500 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-teal-600 transition-colors disabled:bg-green-500" [disabled]="addedProductId() === product.id">
+                                @if(addedProductId() === product.id) {
+                                    <span>تمت الإضافة!</span>
+                                } @else {
+                                    <span>أضف للسلة</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    } @else {
+        <div class="bg-white p-8 rounded-lg shadow-md text-center">
+            <p class="text-slate-500">لم يتم العثور على منتجات تطابق بحثك.</p>
+        </div>
+    }
+</div>

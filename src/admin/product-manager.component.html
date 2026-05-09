@@ -1,0 +1,69 @@
+<div class="space-y-6">
+    <!-- Add/Edit Product Form -->
+    <div class="bg-white p-6 rounded-lg shadow-sm">
+        <h3 class="text-xl font-semibold text-slate-800 mb-4">{{ editingProduct() ? 'تعديل المنتج' : 'إضافة منتج جديد' }}</h3>
+        <!-- The form now submits to different handlers based on the editing state -->
+        <form (ngSubmit)="editingProduct() ? saveProduct() : addNewProduct()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700">اسم المنتج</label>
+                <!-- Simplified two-way binding to a single form model object -->
+                <input type="text" [(ngModel)]="productFormModel.name" name="productName" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">السعر (د.ع)</label>
+                <input type="number" [(ngModel)]="productFormModel.price" name="productPrice" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700">الوصف</label>
+                <textarea [(ngModel)]="productFormModel.description" name="productDescription" rows="2" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"></textarea>
+            </div>
+             <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700">رابط الصورة</label>
+                <input type="text" [(ngModel)]="productFormModel.imageUrl" name="productImageUrl" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-2">
+                 @if(editingProduct()) {
+                    <button type="button" (click)="cancelEditing()" class="px-4 py-2 text-sm font-medium rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700">حفظ التعديلات</button>
+                 } @else {
+                    <button type="submit" class="px-4 py-2 text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700">إضافة المنتج</button>
+                 }
+            </div>
+        </form>
+    </div>
+
+    <!-- Products Table -->
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">المنتج</th>
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">السعر</th>
+                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">تعديل</span></th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-200">
+                @for(product of products(); track product.id) {
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <img class="h-10 w-10 rounded-full object-cover" [src]="product.imageUrl" alt="">
+                                </div>
+                                <div class="mr-4">
+                                    <div class="text-sm font-medium text-slate-900">{{ product.name }}</div>
+                                    <div class="text-sm text-slate-500">{{ product.description }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ product.price | number:'1.0-0' }} د.ع</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+                            <button (click)="startEditing(product)" class="text-teal-600 hover:text-teal-900">تعديل</button>
+                            <button (click)="deleteProduct(product.id)" class="text-red-600 hover:text-red-900 mr-4">حذف</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
