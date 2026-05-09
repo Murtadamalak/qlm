@@ -1,0 +1,83 @@
+<div>
+  @if (!selectedOrder()) {
+    <div class="overflow-hidden rounded-[2rem] border border-[#004643]/10 bg-white/70 shadow-xl shadow-[#004643]/5 backdrop-blur">
+      <table class="min-w-full divide-y divide-[#004643]/10">
+        <thead class="bg-[#F0EDE5]">
+          <tr>
+            <th scope="col" class="px-6 py-4 text-right text-xs font-black uppercase tracking-wider text-[#004643]/55">رقم الطلب</th>
+            <th scope="col" class="px-6 py-4 text-right text-xs font-black uppercase tracking-wider text-[#004643]/55">اسم الزبون</th>
+            <th scope="col" class="px-6 py-4 text-right text-xs font-black uppercase tracking-wider text-[#004643]/55">التاريخ</th>
+            <th scope="col" class="px-6 py-4 text-right text-xs font-black uppercase tracking-wider text-[#004643]/55">الإجمالي</th>
+            <th scope="col" class="px-6 py-4 text-right text-xs font-black uppercase tracking-wider text-[#004643]/55">الحالة</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#004643]/10">
+          @if(orders().length === 0) {
+            <tr>
+              <td colspan="5" class="px-6 py-12 text-center text-[#004643]/55">لا توجد طلبات لعرضها.</td>
+            </tr>
+          }
+          @for(order of orders(); track order.id) {
+            <tr class="transition hover:bg-[#F0EDE5]/60">
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-black">
+                <button (click)="viewOrderDetails(order)" class="text-[#004643] underline-offset-4 hover:underline">{{ order.id }}</button>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-[#004643]/70">{{ order.customerName }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-[#004643]/70">{{ order.orderDate | date:'short' }}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-black text-[#004643]">{{ order.total | number:'1.0-0' }} د.ع</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm">
+                <select [ngModel]="order.status" (change)="onStatusChange(order, $event)"
+                        [class]="'w-full rounded-2xl border-0 p-2 text-xs font-black outline-none focus:ring-4 focus:ring-[#004643]/10 ' + getStatusClass(order.status)">
+                  @for(status of orderStatuses; track status) {
+                    <option [value]="status">{{ translateStatus(status) }}</option>
+                  }
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (selectedOrder(); as order) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-in" (click)="closeOrderDetails()">
+      <div class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-[2rem] bg-[#F0EDE5] shadow-2xl animate-scale-up" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between bg-[#004643] p-5 text-[#F0EDE5]">
+          <h3 class="text-xl font-black">تفاصيل الطلب: {{ order.id }}</h3>
+          <button (click)="closeOrderDetails()" class="rounded-2xl p-2 text-[#F0EDE5]/70 hover:bg-[#F0EDE5]/10 hover:text-[#F0EDE5]">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <div class="overflow-y-auto p-6">
+          <div class="mb-6 grid grid-cols-1 gap-4 border-b border-[#004643]/10 pb-5 sm:grid-cols-2">
+            <div><span class="font-bold text-[#004643]/55">الزبون:</span> <span class="font-black text-[#004643]">{{ order.customerName }}</span></div>
+            <div><span class="font-bold text-[#004643]/55">التاريخ:</span> <span class="font-black text-[#004643]">{{ order.orderDate | date:'fullDate' }} - {{ order.orderDate | date:'shortTime' }}</span></div>
+            <div><span class="font-bold text-[#004643]/55">الإجمالي:</span> <span class="text-lg font-black text-[#004643]">{{ order.total | number:'1.0-0' }} د.ع</span></div>
+            <div><span class="font-bold text-[#004643]/55">الحالة:</span> <span [class]="'rounded-full px-3 py-1 text-xs font-black ' + getStatusClass(order.status)">{{ translateStatus(order.status) }}</span></div>
+          </div>
+
+          <h4 class="mb-4 text-lg font-black text-[#004643]">العناصر المطلوبة ({{ order.items.length }})</h4>
+          <ul class="space-y-3">
+            @for(item of order.items; track $index) {
+              <li class="rounded-2xl border border-[#004643]/10 bg-white/70 p-4">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="font-black text-[#004643]">{{item.name}}</p>
+                    <p class="text-sm text-[#004643]/60">{{ item.description }}</p>
+                  </div>
+                  <p class="whitespace-nowrap font-black text-[#004643]">{{ item.price | number:'1.0-0' }} د.ع</p>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <div class="flex justify-end border-t border-[#004643]/10 p-4">
+          <button (click)="closeOrderDetails()" class="rounded-2xl bg-[#004643] px-6 py-3 text-sm font-black text-[#F0EDE5] hover:bg-[#003B38]">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

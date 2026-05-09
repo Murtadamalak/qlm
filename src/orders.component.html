@@ -1,0 +1,49 @@
+<div class="mx-auto max-w-5xl">
+  <div class="mb-8">
+    <p class="text-sm font-black uppercase tracking-[0.35em] text-[#004643]/45">Orders</p>
+    <h2 class="mt-2 text-4xl font-black text-[#004643]">طلباتك</h2>
+  </div>
+
+  @if (userOrders().length === 0) {
+    <div class="rounded-[2rem] border border-[#004643]/10 bg-white/70 p-12 text-center shadow-xl shadow-[#004643]/5">
+      <p class="text-lg font-bold text-[#004643]/60">لم تقم بأي طلبات بعد.</p>
+    </div>
+  } @else {
+    <div class="space-y-5">
+      @for (order of userOrders(); track order.id) {
+        <article class="overflow-hidden rounded-[2rem] border border-[#004643]/10 bg-white/70 shadow-xl shadow-[#004643]/5 backdrop-blur">
+          <div class="flex flex-col gap-4 bg-[#004643] p-5 text-[#F0EDE5] sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 class="text-xl font-black">{{ order.id }}</h3>
+              <p class="mt-1 text-sm text-[#F0EDE5]/60">تاريخ الطلب: {{ order.orderDate | date:'medium' }}</p>
+              @if(authService.isAdmin()) {
+                <p class="mt-1 text-sm font-bold text-[#F0EDE5]/80">الزبون: {{ order.customerName }}</p>
+              }
+            </div>
+            <div class="text-start sm:text-left">
+              <span class="text-2xl font-black">{{ order.total | number:'1.0-0' }} د.ع</span>
+              <p [class]="'mt-2 inline-flex rounded-full px-3 py-1 text-xs font-black ' + getStatusClass(order.status)">
+                {{ translateStatus(order.status) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="p-5">
+            <h4 class="mb-3 font-black text-[#004643]">العناصر</h4>
+            <ul class="grid gap-3">
+              @for(item of order.items; track $index) {
+                <li class="flex justify-between gap-4 rounded-2xl bg-[#F0EDE5] p-4">
+                  <div>
+                    <span class="font-black text-[#004643]">{{ item.name }}</span>
+                    <p class="mt-1 text-sm text-[#004643]/60">{{ item.description }}</p>
+                  </div>
+                  <span class="font-black text-[#004643]">{{ item.price | number:'1.0-0' }} د.ع</span>
+                </li>
+              }
+            </ul>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>
