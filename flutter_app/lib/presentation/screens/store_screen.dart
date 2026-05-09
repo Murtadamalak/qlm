@@ -33,13 +33,36 @@ class StoreScreen extends StatelessWidget {
           if (products.isEmpty) {
             return const Center(child: Text('No products available.'));
           }
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: products.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return _ProductTile(product: product);
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              if (width < 700) {
+                return ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: products.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return _ProductTile(product: product);
+                  },
+                );
+              }
+
+              final crossAxisCount = width >= 1200 ? 4 : 3;
+              return GridView.builder(
+                padding: const EdgeInsets.all(24),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 1.6,
+                ),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return _ProductTile(product: product);
+                },
+              );
             },
           );
         },

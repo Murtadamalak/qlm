@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/entities/app_user.dart';
+import 'package:flutter/foundation.dart';
 import '../../core/services/notification_service.dart';
 
 class AuthController extends ChangeNotifier {
@@ -49,12 +50,22 @@ class AuthController extends ChangeNotifier {
         smsCode: smsCode,
       );
       if (_currentUser != null) {
-        await NotificationService().initialize(_currentUser!.id);
+        await _registerNotifications(_currentUser!.id);
       }
     } catch (error) {
       _errorMessage = error.toString();
     } finally {
       _setLoading(false);
+    }
+  }
+
+  Future<void> _registerNotifications(String userId) async {
+    try {
+      await NotificationService().initialize(userId);
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint('Notification registration skipped: $error');
+      }
     }
   }
 

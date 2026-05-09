@@ -5,7 +5,7 @@ import 'core/config/firebase_options_loader.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final options = await FirebaseOptionsLoader.load();
+  final options = FirebaseOptionsLoader.load();
   await Firebase.initializeApp(options: options);
   runApp(const ELibraryPrintingApp());
 }

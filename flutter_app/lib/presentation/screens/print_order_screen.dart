@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +25,9 @@ class _PrintOrderScreenState extends State<PrintOrderScreen> {
   String _paperSize = 'A4';
   bool _isColor = true;
   String _binding = 'None';
-  File? _selectedFile;
+  Uint8List? _selectedFileBytes;
   String? _fileName;
+  String _contentType = 'application/octet-stream';
   bool _isUploading = false;
 
   @override
@@ -39,17 +40,38 @@ class _PrintOrderScreenState extends State<PrintOrderScreen> {
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'docx', 'jpg', 'png'],
+      allowedExtensions: ['pdf', 'docx', 'jpg', 'jpeg', 'png'],
+      withData: true,
     );
     if (result == null || result.files.isEmpty) return;
+    final file = result.files.single;
+    if (file.bytes == null) return;
     setState(() {
-      _selectedFile = File(result.files.single.path!);
-      _fileName = result.files.single.name;
+      _selectedFileBytes = file.bytes;
+      _fileName = file.name;
+      _contentType = _contentTypeFor(file.extension);
     });
   }
 
+
+  String _contentTypeFor(String? extension) {
+    switch (extension?.toLowerCase()) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      default:
+        return 'application/octet-stream';
+    }
+  }
+
   Future<void> _submitOrder() async {
-    if (!_formKey.currentState!.validate() || _selectedFile == null) {
+    if (!_formKey.currentState!.validate() || _selectedFileBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please complete all fields.')),
       );
@@ -72,10 +94,11 @@ class _PrintOrderScreenState extends State<PrintOrderScreen> {
     try {
       final userId = auth.currentUser?.id ?? '';
       final uploader = StorageRemoteDataSource();
-      final fileUrl = await uploader.uploadPrintFile(
-        file: _selectedFile!,
+      final fileUrl = await uploader.uploadPrintFileBytes(
+        bytes: _selectedFileBytes!,
         userId: userId,
         fileName: _fileName ?? 'document',
+        contentType: _contentType,
       );
       final order = PrintOrder(
         id: '',
@@ -122,7 +145,13 @@ class _PrintOrderScreenState extends State<PrintOrderScreen> {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        pricing.setRule(snapshot.data);
+        if (pricing.rule != snapshot.data) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              pricing.setRule(snapshot.data);
+            }
+          });
+        }
         return Scaffold(
           appBar: AppBar(title: const Text('Print Order')),
           body: SingleChildScrollView(

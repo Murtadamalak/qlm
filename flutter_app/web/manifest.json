@@ -1,0 +1,11 @@
+{
+  "name": "E-Library & Printing Services",
+  "short_name": "E-Library Print",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3f51b5",
+  "description": "Order printing services, buy stationery, and track orders from web, phone, tablet, and desktop.",
+  "orientation": "any",
+  "prefer_related_applications": false
+}

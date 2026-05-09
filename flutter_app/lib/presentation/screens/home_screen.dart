@@ -42,53 +42,63 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _FeatureCard(
-                    title: 'Printing Services',
-                    icon: Icons.print,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      PrintOrderScreen.routeName,
-                    ),
-                  ),
-                  _FeatureCard(
-                    title: 'Products Store',
-                    icon: Icons.store,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      StoreScreen.routeName,
-                    ),
-                  ),
-                  _FeatureCard(
-                    title: 'My Orders',
-                    icon: Icons.receipt_long,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      OrdersScreen.routeName,
-                    ),
-                  ),
-                  _FeatureCard(
-                    title: 'Customer Support',
-                    icon: Icons.support_agent,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      SupportScreen.routeName,
-                    ),
-                  ),
-                  if (authController.currentUser?.role == 'admin')
-                    _FeatureCard(
-                      title: 'Admin Dashboard',
-                      icon: Icons.admin_panel_settings,
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        AdminDashboardScreen.routeName,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  final crossAxisCount = width >= 1100
+                      ? 4
+                      : width >= 700
+                          ? 3
+                          : 2;
+                  return GridView.count(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    children: [
+                      _FeatureCard(
+                        title: 'Printing Services',
+                        icon: Icons.print,
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          PrintOrderScreen.routeName,
+                        ),
                       ),
-                    ),
-                ],
+                      _FeatureCard(
+                        title: 'Products Store',
+                        icon: Icons.store,
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          StoreScreen.routeName,
+                        ),
+                      ),
+                      _FeatureCard(
+                        title: 'My Orders',
+                        icon: Icons.receipt_long,
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          OrdersScreen.routeName,
+                        ),
+                      ),
+                      _FeatureCard(
+                        title: 'Customer Support',
+                        icon: Icons.support_agent,
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          SupportScreen.routeName,
+                        ),
+                      ),
+                      if (authController.currentUser?.role == 'admin')
+                        _FeatureCard(
+                          title: 'Admin Dashboard',
+                          icon: Icons.admin_panel_settings,
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            AdminDashboardScreen.routeName,
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
